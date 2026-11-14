@@ -56,7 +56,7 @@ export default function Landing() {
               <span className="h-2 w-2 rounded-full bg-sun" aria-hidden />
               {land.eyebrow}
             </p>
-            <h1 className="display mt-5 text-[2.6rem] sm:text-6xl lg:text-[4.25rem]">{land.heroTitle}</h1>
+            <h1 className={cx('display mt-5', lang === 'en' ? 'text-[2.6rem] sm:text-6xl lg:text-[4.25rem]' : 'text-[2.25rem] sm:text-5xl lg:text-[3.4rem]')}>{land.heroTitle}</h1>
             <p className="mt-5 max-w-xl text-lg text-ink-2 sm:text-xl">{land.heroSub}</p>
             <div className="mt-8">{ctas()}</div>
             <p className="mt-5 flex max-w-xl items-start gap-2 text-sm text-ink-2">

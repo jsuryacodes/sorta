@@ -74,7 +74,6 @@ const te: Strings = {
     retry: 'మళ్ళీ ప్రయత్నించండి',
     reminders: 'గుర్తుచేతలు',
     language: 'భాష',
-    myShop: 'నా షాపు',
     today: 'ఈరోజు',
     yesterday: 'నిన్న',
     recorded: 'నమోదైంది',

@@ -6,7 +6,7 @@ import { STR } from './i18n'
 import Inventory from './Inventory'
 import { configured, resetDemo, useShop, useStored, type Shop } from './store'
 import type { Lang } from './types'
-import { Button, ErrorState, Icon, LangSelect, Logo, Skeleton, cx, navigate, type IconName } from './ui'
+import { Button, ErrorState, Icon, LangSelect, Logo, LogoMark, Skeleton, cx, navigate, type IconName } from './ui'
 
 const TABS: [Tab, IconName][] = [
   ['chat', 'chat'],
@@ -91,7 +91,6 @@ export default function App() {
           ))}
         </nav>
         <div className="mt-auto flex flex-col gap-2 border-t border-line p-4">
-          <p className="px-1 text-sm font-semibold text-ink-2">{demo ? ui.demoShop : ui.myShop}</p>
           {demoSwitch}
           <LangSelect lang={lang} setLang={setLang} />
         </div>
@@ -101,17 +100,18 @@ export default function App() {
         {/* Mobile header */}
         <header className="flex items-center gap-2 border-b border-line bg-card px-3 py-2 pt-[max(0.5rem,env(safe-area-inset-top))] md:hidden">
           <a href="/" onClick={(e) => (e.preventDefault(), navigate('/'))} className="mr-auto rounded-lg p-1" aria-label="Sorta">
-            <Logo size="sm" />
+            <LogoMark className="h-8 w-8 min-[420px]:hidden" />
+            <Logo size="sm" className="max-[419px]:hidden" />
           </a>
           <LangSelect lang={lang} setLang={setLang} className="w-[8.5rem]" />
           {demoSwitch}
         </header>
 
         {demo && (
-          <div role="status" className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-sun bg-sun-soft px-4 py-2 text-sm font-semibold sm:text-[15px]">
-            <Icon name="store" className="h-[18px] w-[18px] text-low" />
-            <span className="min-w-0 flex-1 basis-48">{ui.demoOn}</span>
-            <Button size="sm" variant="quiet" onClick={reset} disabled={resetting} className="bg-card/70">
+          <div role="status" className="flex items-center gap-3 border-b border-sun bg-sun-soft px-4 py-1.5 text-[13px] font-semibold leading-snug sm:py-2 sm:text-[15px]">
+            <Icon name="store" className="h-[18px] w-[18px] text-low max-sm:hidden" />
+            <span className="min-w-0 flex-1 max-sm:line-clamp-2">{ui.demoOn}</span>
+            <Button size="sm" variant="quiet" onClick={reset} disabled={resetting} className="min-h-9 shrink-0 bg-card/70 px-2.5 text-[13px] sm:min-h-10 sm:text-sm">
               <Icon name="refresh" className={cx('h-4 w-4', resetting && 'animate-spin')} />
               {resetting ? ui.loading : ui.resetDemo}
             </Button>
@@ -143,7 +143,7 @@ export default function App() {
               key={id}
               onClick={() => setTab(id)}
               aria-current={tab === id ? 'page' : undefined}
-              className={cx('flex min-h-16 min-w-0 flex-col items-center justify-center gap-1 px-1 pt-1.5 pb-1 text-[13px] font-semibold leading-tight', tab === id ? 'text-brand' : 'text-ink-2')}
+              className={cx('flex min-h-16 min-w-0 flex-col items-center justify-center gap-1 px-1 pt-1.5 pb-1 text-[13px] font-semibold leading-tight focus-visible:-outline-offset-4', tab === id ? 'text-brand' : 'text-ink-2')}
             >
               <span className={cx('grid h-8 w-14 place-items-center rounded-full transition-colors', tab === id && 'bg-brand-soft')}>
                 <Icon name={icon} className="h-[22px] w-[22px]" />

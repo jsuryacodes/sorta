@@ -65,7 +65,7 @@ export default function Inventory({ data, lang, shop, reload }: { data: Data; la
           <Icon name="search" className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-ink-3" />
           <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={ui.search} className={cx(inputCls, 'pl-11')} />
         </label>
-        <div className="flex gap-2 overflow-x-auto pb-0.5" role="group" aria-label={ui.filter}>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={ui.filter}>
           {FILTERS.map(([id, label]) => (
             <button
               key={id}
@@ -289,7 +289,7 @@ function Form({ lang, initial, onSave, onCancel }: { lang: Lang; initial: Draft;
       {field(ui.quantity, 'quantity', 'number')}
       <label className="block min-w-0">
         <span className="mb-1 block text-sm font-semibold text-ink-2">{ui.unit}</span>
-        <select value={d.unit} onChange={(e) => setD({ ...d, unit: e.target.value })} className={inputCls}>
+        <select value={d.unit} onChange={(e) => setD({ ...d, unit: e.target.value })} className={cx(inputCls, 'select')}>
           {Object.entries(ui.units).map(([u, label]) => (
             <option key={u} value={u}>{label}</option>
           ))}

@@ -38,8 +38,8 @@ const ICONS = {
 } as const
 export type IconName = keyof typeof ICONS
 
-export const Icon = ({ name, className = 'h-5 w-5' }: { name: IconName; className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden className={cx('shrink-0', className)}>
+export const Icon = ({ name, className = '' }: { name: IconName; className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden className={cx('shrink-0', !/(^|\s)h-/.test(className) && 'h-5 w-5', className)}>
     <path d={ICONS[name]} />
   </svg>
 )
@@ -308,13 +308,13 @@ export function Reminders({ debts, lang, compact }: { debts: Debt[]; lang: Lang;
       <ul className={cx('divide-y divide-line', compact && 'max-h-44 overflow-y-auto')}>
         {due.map((d) => {
           const pay = d.direction === 'i_owe'
+          const late = daysBetween(todayISO(), d.due_date!) < 0
           return (
             <li key={d.id} className="flex items-center gap-3 px-4 py-3">
-              <Avatar name={d.person} tone={pay ? 'out' : 'in'} />
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold leading-snug">{(pay ? ui.reminderPay : ui.reminderCollect)(d.person, money(d.amount), dueLabel(d, lang)!)}</p>
-              </div>
-              <DueBadge d={d} lang={lang} />
+              <span className={cx('grid h-10 w-10 shrink-0 place-items-center rounded-full', late ? 'bg-late text-white' : 'bg-low-soft text-low')}>
+                <Icon name={late ? 'alert' : 'clock'} />
+              </span>
+              <p className="min-w-0 flex-1 font-semibold leading-snug">{(pay ? ui.reminderPay : ui.reminderCollect)(d.person, money(d.amount), dueLabel(d, lang)!)}</p>
             </li>
           )
         })}

@@ -19,7 +19,7 @@ export default function Chat({ data, lang, shop, reload }: { data: Data; lang: L
   const end = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    end.current?.scrollIntoView({ block: 'end' }) // braces matter: scrollIntoView may return a Promise
+    if (data.messages.length || sending) end.current?.scrollIntoView({ block: 'end' }) // braces matter: scrollIntoView may return a Promise
   }, [data.messages.length, sending])
   useEffect(() => setPending(undefined), [shop])
   useLayoutEffect(() => {
@@ -152,7 +152,7 @@ export default function Chat({ data, lang, shop, reload }: { data: Data; lang: L
                       )}
                     </div>
                   ) : (
-                    <p className="whitespace-pre-wrap rounded-2xl rounded-tl-md border border-line bg-card px-4 py-2.5 text-[17px] leading-snug shadow-card">{rich(m.text)}</p>
+                    <p className="whitespace-pre-wrap rounded-2xl rounded-tl-md border border-line bg-card px-4 py-2.5 text-[17px] leading-snug shadow-card">{rich(m.text, false)}</p>
                   )}
                 </Incoming>
               )}
@@ -224,10 +224,13 @@ const Incoming = ({ children, time, label }: { children: ReactNode; time?: strin
   </div>
 )
 
-/** Colours cash changes in a reply (+₹ green, −₹ red) and swaps the warning emoji for an icon. */
-const rich = (text: string) =>
+/** Colours cash changes in a reply (+₹ green, −₹ red) and swaps the warning emoji for an icon.
+ *  Only action replies get colours: an undo reply quotes the original change, which was reversed. */
+const rich = (text: string, colour = true) =>
   text.split(/([+−]₹[\d,.]*\d|⚠️\s?)/).map((s, i) =>
-    s.startsWith('+₹') ? (
+    !colour && s.includes('₹') ? (
+      s
+    ) : s.startsWith('+₹') ? (
       <strong key={i} className="whitespace-nowrap font-bold text-in">{s}</strong>
     ) : s.startsWith('−₹') ? (
       <strong key={i} className="whitespace-nowrap font-bold text-out">{s}</strong>

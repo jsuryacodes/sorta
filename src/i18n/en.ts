@@ -73,7 +73,6 @@ const en = {
     retry: 'Try again',
     reminders: 'Reminders',
     language: 'Language',
-    myShop: 'My shop',
     today: 'Today',
     yesterday: 'Yesterday',
     recorded: 'Recorded',

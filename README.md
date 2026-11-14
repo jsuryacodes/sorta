@@ -64,7 +64,8 @@ src/parser/      text.ts (tokens, number words, fuzzy), dates.ts, parse.ts, pars
 src/agent.ts     parsed message -> reply + operations (pure)
 src/store.ts     Supabase calls and the data hook
 src/i18n/        en.ts, hi.ts, te.ts — one file per language (labels and replies)
-src/*.tsx        Chat, Dashboard, Inventory, Debts screens
+src/*.tsx        Landing page ("/") and the Chat, Dashboard, Inventory, Debts screens ("/app")
+src/ui.tsx       design system: icons, logo and shared components (tokens live in src/index.css)
 supabase/migrations/   schema, apply/undo functions, demo seed
 ```
 

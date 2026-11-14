@@ -74,7 +74,6 @@ const hi: Strings = {
     retry: 'फिर कोशिश करें',
     reminders: 'याद दिलाना',
     language: 'भाषा',
-    myShop: 'मेरी दुकान',
     today: 'आज',
     yesterday: 'कल',
     recorded: 'दर्ज हो गया',
