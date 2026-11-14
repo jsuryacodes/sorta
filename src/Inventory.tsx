@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { money, qtyText } from './agent'
+import { displayName, money, qtyText } from './agent'
 import { STR } from './i18n'
 import { norm } from './parser/text'
 import { productStats, todayISO } from './stats'
@@ -44,17 +44,17 @@ export default function Inventory({ data, lang, shop, reload }: { data: Data; la
       {error && <p className="text-red-700">{ui.error}: {error}</p>}
       {editing === 'new' && <Form lang={lang} initial={BLANK} onCancel={() => setEditing(null)} onSave={(d) => save(null, d)} />}
       {!list.length && <p className="text-stone-400">{ui.nothing}</p>}
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {list.map((p) => {
           if (editing === p.id) return <Form key={p.id} lang={lang} initial={p} onCancel={() => setEditing(null)} onSave={(d) => save(p, d)} />
           const s = productStats(p, data.movements, today)
           const expired = s.expiresIn !== null && s.expiresIn < 0
           const soon = s.expiresIn !== null && s.expiresIn >= 0 && s.expiresIn <= 7
           return (
-            <article key={p.id} className="rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
+            <article key={p.id} className="min-w-0 rounded-2xl border border-stone-200 bg-white p-4 shadow-sm">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <h3 className="text-lg font-semibold">{p.name}</h3>
+                  <h3 className="text-lg font-semibold">{displayName(p, lang)}</h3>
                   {p.aliases.length > 0 && <p className="truncate text-sm text-stone-500">{p.aliases.join(' · ')}</p>}
                 </div>
                 <button onClick={() => setEditing(p.id)} className="rounded-lg border border-stone-300 px-3 py-1.5 text-sm font-semibold">{ui.edit}</button>
@@ -87,7 +87,7 @@ export default function Inventory({ data, lang, shop, reload }: { data: Data; la
 }
 
 const Row = ({ k, v }: { k: string; v: string }) => (
-  <div>
+  <div className="min-w-0">
     <dt className="text-stone-500">{k}</dt>
     <dd className="font-medium">{v}</dd>
   </div>

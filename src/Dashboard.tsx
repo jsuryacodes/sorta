@@ -38,7 +38,7 @@ export default function Dashboard({ data, lang }: { data: Data; lang: Lang }) {
         <Stat label={ui.iOwe} value={money(sum('i_owe'))} tone="text-red-700" />
         <Stat label={ui.owedToMe} value={money(sum('they_owe'))} tone="text-emerald-700" />
       </div>
-      <div className="grid gap-3 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
         <Card title={ui.debtsDueSoon}>
           {dueSoon.length ? (
             <ul className="divide-y divide-stone-100">

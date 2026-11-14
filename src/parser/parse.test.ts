@@ -368,3 +368,14 @@ describe('agent: plans and safety', () => {
     expect(run('galti ho gayi')).toMatchObject({ undo: true })
   })
 })
+
+describe('example chips shown in the chat', async () => {
+  const { STR } = await import('../i18n')
+  for (const lang of ['en', 'hi', 'te'] as const)
+    for (const ex of STR[lang].ui.examples)
+      it(`${lang}: ${ex}`, () => {
+        const got = p(ex)
+        expect(got.intent).not.toBe('unknown')
+        expect(got.lang).toBe(lang)
+      })
+})

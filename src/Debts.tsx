@@ -68,7 +68,7 @@ export default function Debts({ data, lang, shop, reload }: { data: Data; lang: 
     <div className="space-y-3 p-3">
       <Reminders debts={data.debts} lang={lang} />
       {error && <p className="text-red-700">{ui.error}: {error}</p>}
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {section('i_owe', ui.iOwe, 'text-red-700')}
         {section('they_owe', ui.owedToMe, 'text-emerald-700')}
       </div>

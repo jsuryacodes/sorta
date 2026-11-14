@@ -18,7 +18,9 @@ export default function Chat({ data, lang, shop, reload }: { data: Data; lang: L
   const input = useRef<HTMLTextAreaElement>(null)
   const end = useRef<HTMLDivElement>(null)
 
-  useEffect(() => end.current?.scrollIntoView({ block: 'end' }), [data.messages.length, sending])
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: 'end' }) // braces matter: scrollIntoView may return a Promise
+  }, [data.messages.length, sending])
   useEffect(() => setPending(undefined), [shop])
 
   const undoReply = async (l: Lang, id?: string) => {
