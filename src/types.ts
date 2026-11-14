@@ -47,6 +47,7 @@ export interface Action {
   id: string
   summary: string | null
   undone: boolean
+  created_at: string
 }
 
 /** Primitive ops understood by the apply_ops() SQL function. */

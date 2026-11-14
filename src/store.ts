@@ -7,6 +7,7 @@ export type Shop = 'main' | 'demo'
 export interface Data extends ShopState {
   messages: Message[]
   undone: Set<string> // ids of actions that were undone
+  actions: Action[] // newest first
 }
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
@@ -22,7 +23,7 @@ async function load(shop: Shop): Promise<Data> {
     // ponytail: newest 1000 movements only (PostgREST page cap); move profit/forecast sums into SQL when a shop outgrows it
     sb.from('stock_movements').select('*').eq('shop_id', shop).order('created_at', { ascending: false }).limit(1000),
     sb.from('messages').select('*').eq('shop_id', shop).order('seq', { ascending: false }).limit(200),
-    sb.from('action_log').select('id').eq('shop_id', shop).eq('undone', true).order('seq', { ascending: false }).limit(500),
+    sb.from('action_log').select('id,summary,undone,created_at').eq('shop_id', shop).order('seq', { ascending: false }).limit(500),
   ])
   const err = [s, p, d, m, msg, a].find((r) => r.error)?.error
   if (err) throw err
@@ -37,7 +38,8 @@ async function load(shop: Shop): Promise<Data> {
     debts: d.data as Debt[],
     movements: m.data as Movement[],
     messages: (msg.data as Message[]).reverse(),
-    undone: new Set((a.data as { id: string }[]).map((x) => x.id)),
+    undone: new Set((a.data as Action[]).filter((x) => x.undone).map((x) => x.id)),
+    actions: a.data as Action[],
   }
 }
 

@@ -9,6 +9,7 @@ export const daysBetween = (from: string, to: string) => Math.round((Date.parse(
 export function todayTotals(movements: Movement[], today = todayISO()) {
   const sales = movements.filter((m) => m.type === 'sale' && localDay(m.created_at) === today)
   return {
+    count: sales.length,
     sales: sales.reduce((s, m) => s + m.price * m.quantity, 0),
     profit: sales.reduce((s, m) => s + (m.price - m.cost) * m.quantity, 0),
   }

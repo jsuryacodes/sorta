@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Chat from './Chat'
 import Dashboard from './Dashboard'
 import Debts from './Debts'
@@ -21,6 +21,15 @@ export default function App() {
   const [tab, setTab] = useStored<Tab>('sorta.tab', 'chat')
   const [resetting, setResetting] = useState(false)
   const { data, error, reload } = useShop(shop)
+  // Screens always show fresh numbers: reload when switching tabs and when coming back to the app.
+  useEffect(() => {
+    if (configured) void reload()
+  }, [tab, reload])
+  useEffect(() => {
+    const onFocus = () => configured && void reload()
+    window.addEventListener('focus', onFocus)
+    return () => window.removeEventListener('focus', onFocus)
+  }, [reload])
   const ui = STR[lang].ui
   const demo = shop === 'demo'
 
