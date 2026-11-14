@@ -4,10 +4,10 @@ import { STR } from './i18n'
 import { daysBetween, todayISO } from './stats'
 import { doAction, type Data, type Shop } from './store'
 import type { Debt, Dir, Lang } from './types'
-import { Card, Reminders, dueLabel } from './ui'
+import { Avatar, Badge, Banner, DueBadge, EmptyState, Icon, Money, PageHeader, Reminders, cx, shortDate } from './ui'
 
 export default function Debts({ data, lang, shop, reload }: { data: Data; lang: Lang; shop: Shop; reload: () => Promise<void> }) {
-  const { ui, r, locale } = STR[lang]
+  const { ui, r } = STR[lang]
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const today = todayISO()
@@ -30,26 +30,45 @@ export default function Debts({ data, lang, shop, reload }: { data: Data; lang: 
     }
   }
 
-  const section = (dir: Dir, title: string, tone: string) => {
+  const section = (dir: Dir) => {
+    const pay = dir === 'i_owe'
     const list = data.debts.filter((d) => d.direction === dir && !d.settled)
+    const total = list.reduce((s, d) => s + d.amount, 0)
     return (
-      <Card title={`${title} · ${money(list.reduce((s, d) => s + d.amount, 0))}`}>
+      <section aria-labelledby={`h-${dir}`} className="min-w-0 overflow-hidden rounded-card border border-line bg-card shadow-card">
+        <header className={cx('border-b px-5 pt-4 pb-5', pay ? 'border-out/15 bg-out-soft' : 'border-in/15 bg-in-soft')}>
+          <h2 id={`h-${dir}`} className={cx('flex items-center gap-2 font-bold', pay ? 'text-out' : 'text-in')}>
+            <Icon name={pay ? 'out' : 'in'} />
+            <span className="flex-1">{pay ? ui.iOwe : ui.owedToMe}</span>
+            <span className="text-sm font-semibold text-ink-2">{ui.openCount(list.length)}</span>
+          </h2>
+          <Money value={total} className={cx('mt-2 block text-[2.4rem] break-all', pay ? 'text-out' : 'text-in')} />
+          <p className="mt-1 text-sm text-ink-2">{pay ? ui.iOweNote : ui.owedToMeNote}</p>
+        </header>
         {list.length ? (
-          <ul className="divide-y divide-stone-100">
+          <ul className="divide-y divide-line">
             {list.map((d) => {
-              const urgent = d.due_date && daysBetween(today, d.due_date) <= 1
+              const late = d.due_date !== null && daysBetween(today, d.due_date) < 0
               return (
-                <li key={d.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-3">
+                <li key={d.id} className={cx('flex flex-wrap items-center gap-x-3 gap-y-2.5 px-5 py-4', late && 'bg-out-soft/40')}>
+                  <Avatar name={d.person} tone={pay ? 'out' : 'in'} />
                   <div className="min-w-0 flex-1">
-                    <div className="font-semibold">{d.person}</div>
-                    <div className={`text-sm ${urgent ? 'font-semibold text-red-700' : 'text-stone-500'}`}>
-                      {d.due_date
-                        ? `${ui.due}: ${new Date(d.due_date + 'T00:00:00').toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })}${dueLabel(d, lang) ? ` · ${dueLabel(d, lang)}` : ''}`
-                        : ui.noDueDate}
+                    <div className="truncate text-[17px] font-bold">{d.person}</div>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-ink-2">
+                      <span className="inline-flex items-center gap-1">
+                        <Icon name="clock" className="h-3.5 w-3.5" />
+                        {d.due_date ? `${ui.due} ${shortDate(d.due_date, lang, true)}` : ui.noDueDate}
+                      </span>
+                      <DueBadge d={d} lang={lang} />
                     </div>
                   </div>
-                  <div className={`text-lg font-bold ${tone}`}>{money(d.amount)}</div>
-                  <button onClick={() => settle(d)} disabled={busy !== null} className="rounded-xl bg-emerald-700 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50">
+                  <div className={cx('figure text-xl', pay ? 'text-out' : 'text-in')}>{money(d.amount)}</div>
+                  <button
+                    onClick={() => settle(d)}
+                    disabled={busy !== null}
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-xl border border-line-2/60 bg-card px-3.5 text-[15px] font-semibold text-ink transition-colors hover:border-in hover:bg-in-soft hover:text-in disabled:opacity-45 sm:w-auto"
+                  >
+                    <Icon name={busy === d.id ? 'refresh' : 'check'} className={cx('h-[18px] w-[18px]', busy === d.id && 'animate-spin')} />
                     {busy === d.id ? ui.loading : ui.markSettled}
                   </button>
                 </li>
@@ -57,32 +76,42 @@ export default function Debts({ data, lang, shop, reload }: { data: Data; lang: 
             })}
           </ul>
         ) : (
-          <p className="text-stone-400">{ui.nothing}</p>
+          <EmptyState>{ui.allClear}</EmptyState>
         )}
-      </Card>
+      </section>
     )
   }
 
   const settled = data.debts.filter((d) => d.settled)
   return (
-    <div className="space-y-3 p-3">
+    <div className="mx-auto w-full max-w-6xl space-y-5 px-4 py-5 sm:px-6 lg:px-8 lg:py-8">
+      <PageHeader title={ui.debts} note={ui.debtsNote} />
       <Reminders debts={data.debts} lang={lang} />
-      {error && <p className="text-red-700">{ui.error}: {error}</p>}
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        {section('i_owe', ui.iOwe, 'text-red-700')}
-        {section('they_owe', ui.owedToMe, 'text-emerald-700')}
+      {error && <Banner>{ui.error}: {error}</Banner>}
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+        {section('they_owe')}
+        {section('i_owe')}
       </div>
       {settled.length > 0 && (
-        <Card title={ui.settled}>
-          <ul className="divide-y divide-stone-100 text-stone-500">
+        <details className="group rounded-card border border-line bg-card shadow-card">
+          <summary className="flex min-h-14 cursor-pointer list-none items-center gap-2 rounded-card px-5 font-bold [&::-webkit-details-marker]:hidden">
+            <Icon name="check" className="text-in" />
+            <span className="flex-1">{ui.settled}</span>
+            <span className="rounded-full bg-paper px-2 text-sm tabular-nums text-ink-2">{settled.length}</span>
+            <Icon name="chevron" className="h-4 w-4 text-ink-3 transition-transform group-open:rotate-90" />
+          </summary>
+          <ul className="divide-y divide-line border-t border-line">
             {settled.map((d) => (
-              <li key={d.id} className="flex justify-between py-2">
-                <span>{d.person} · {d.direction === 'i_owe' ? ui.iOwe : ui.owedToMe}</span>
-                <span className="line-through">{money(d.amount)}</span>
+              <li key={d.id} className="flex items-center gap-3 px-5 py-3 text-ink-2">
+                <span className="min-w-0 flex-1 truncate">
+                  <span className="font-semibold text-ink">{d.person}</span> · {d.direction === 'i_owe' ? ui.iOwe : ui.owedToMe}
+                </span>
+                <Badge icon="check" tone="neutral">{ui.settled}</Badge>
+                <span className="tabular-nums line-through">{money(d.amount)}</span>
               </li>
             ))}
           </ul>
-        </Card>
+        </details>
       )}
     </div>
   )
