@@ -1,11 +1,134 @@
 @import 'tailwindcss';
 
+/* Design tokens. Everything on screen is built from these. */
+@theme {
+  --font-sans: 'Anek Latin', 'Hind', 'Anek Telugu', system-ui, 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Telugu', sans-serif;
+
+  --color-paper: #f6f1e7;
+  --color-card: #fffdf9;
+  --color-ink: #17181c;
+  --color-ink-2: #55524b; /* secondary text */
+  --color-ink-3: #6b665d; /* hints, placeholders */
+  --color-line: #e3dccd;
+  --color-line-2: #948b79; /* input borders */
+
+  --color-brand: #2233b0;
+  --color-brand-dark: #18257f;
+  --color-brand-soft: #e7eafb;
+  --color-sun: #ffb81c;
+  --color-sun-soft: #fff1cc;
+
+  /* Meaning colours: in = owed to me / cash in / profit, out = I owe / cash out, late = overdue / expired */
+  --color-in: #0b7a4b;
+  --color-in-soft: #dff3e8;
+  --color-out: #c0271f;
+  --color-out-soft: #fce8e5;
+  --color-late: #c0271f;
+  --color-low: #8a5300;
+  --color-low-soft: #ffefc7;
+  --color-exp: #a8430a;
+  --color-exp-soft: #ffe6d5;
+
+  --radius-card: 1.25rem;
+  --shadow-card: 0 1px 0 rgb(23 24 28 / 0.04), 0 10px 24px -16px rgb(23 24 28 / 0.18);
+  --shadow-pop: 0 12px 40px -12px rgb(23 24 28 / 0.35);
+
+  --animate-pop: pop 0.24s cubic-bezier(0.2, 0.9, 0.3, 1.15) both;
+  --animate-rise: rise 0.22s ease-out both;
+  --animate-shimmer: shimmer 1.2s linear infinite;
+  --animate-dot: dot 1s ease-in-out infinite;
+  --animate-flash: flash 0.9s ease-out both;
+
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(6px); }
+  }
+  @keyframes shimmer {
+    to { background-position: -200% 0; }
+  }
+  @keyframes dot {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+  @keyframes flash {
+    from { background-color: var(--color-sun-soft); }
+  }
+}
+
 html,
 body,
 #root {
   height: 100%;
 }
 body {
-  font-family: system-ui, 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Telugu', sans-serif;
+  font-family: var(--font-sans);
+  background: var(--color-paper);
+  color: var(--color-ink);
   -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+/* Devanagari and Telugu are taller than Latin: give them room so nothing clips. */
+:lang(hi),
+:lang(te) {
+  line-height: 1.6;
+}
+
+/* Money and stock figures: heavy, tight, aligned digits. */
+.figure {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+/* Headings */
+.display {
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+}
+:lang(hi) .display,
+:lang(te) .display {
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-brand);
+  outline-offset: 2px;
+}
+.on-dark :focus-visible,
+.on-dark:focus-visible {
+  outline-color: var(--color-sun);
+}
+
+.skeleton {
+  border-radius: 0.75rem;
+  background: linear-gradient(90deg, var(--color-line) 25%, #efe9dc 50%, var(--color-line) 75%);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
+
+/* Notebook paper: faint ruled lines and a red margin rule. */
+.ruled {
+  background-image:
+    linear-gradient(90deg, transparent 1.15rem, rgb(192 39 31 / 0.35) 1.15rem, rgb(192 39 31 / 0.35) calc(1.15rem + 1px), transparent calc(1.15rem + 1px)),
+    repeating-linear-gradient(180deg, transparent 0 1.95rem, rgb(34 51 176 / 0.09) 1.95rem 2rem);
+}
+
+dialog::backdrop {
+  background: rgb(23 24 28 / 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
