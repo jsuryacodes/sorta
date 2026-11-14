@@ -93,7 +93,12 @@ nums('te', `ఒకటి:1 ఒక:1 రెండు:2 మూడు:3 నాల�
  ముప్పై:30 నలభై:40 యాభై:50 అరవై:60 డెబ్బై:70 ఎనభై:80 తొంభై:90 వంద:100 వందల:100 వందలు:100 నూరు:100 వెయ్యి:1000
  వేలు:1000 వేల:1000 లక్ష:100000 సగం:0.5`)
 
-export const isNumberWord = (t: string) => t in NUM
+// "saadhe char" = 4.5, "sava sau" = 125, "paune do" = 1.75
+const MOD: Record<string, number> = {}
+;[['saadhe sadhe sade साढे', 0.5], ['sava sawa सवा', 0.25], ['paune पौने', -0.25]].forEach(([ws, v]) =>
+  (ws as string).split(' ').forEach((w) => (MOD[norm(w)] = v as number)),
+)
+export const isNumberWord = (t: string) => t in NUM || t in MOD
 const PRONOUN = new Set(['i', 'we', 'you', 'they', 'not'])
 
 /** Reads a number (digits or number words, possibly several tokens) starting at index i. */
@@ -103,11 +108,17 @@ export function readNumber(toks: string[], i: number): { value: number; len: num
   let len = 0
   let seen = false
   let digit = false
+  let mod = 0
   for (let j = i; j < toks.length; j++) {
     const t = toks[j]
+    if (t in MOD && !seen && !mod) {
+      mod = MOD[t]
+      continue
+    }
     if (/^\d+(\.\d+)?$/.test(t)) {
       if (seen) break
-      cur = +t
+      cur = +t + mod
+      mod = 0
       digit = seen = true
       len = 1
       continue
@@ -118,13 +129,16 @@ export function readNumber(toks: string[], i: number): { value: number; len: num
     if (v >= 1000) {
       total += (cur || 1) * v
       cur = 0
-    } else if (v === 100) cur = (cur || 1) * 100
-    else {
+    } else if (v === 100) {
+      cur = (cur || 1 + mod) * 100
+      mod = 0
+    } else {
       if (digit) break
       const afterHundreds = cur % 100 === 0 && (cur > 0 || total > 0)
       const afterTens = cur % 10 === 0 && cur % 100 >= 20 && v < 10
       if (seen && !afterHundreds && !afterTens) break // "five ten" is two numbers
-      cur += v
+      cur += v + mod
+      mod = 0
     }
     seen = true
     len = j - i + 1
